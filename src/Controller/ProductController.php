@@ -1,0 +1,106 @@
+<?php
+
+namespace App\Controller;
+
+use App\Entity\Product;
+use App\Form\ProductType;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
+
+#[Route('/product')]
+class ProductController extends AbstractController
+{
+    private $entityManager;
+
+    public function __construct(EntityManagerInterface $entityManager)
+    {
+        $this->entityManager = $entityManager;
+    }
+
+    #[Route('/', name: 'product_index', methods: ['GET'])]
+    public function index(): Response
+    {
+        $products = $this->entityManager->getRepository(Product::class)->findAll();
+
+        return $this->render('product/index.html.twig', [
+            'products' => $products,
+        ]);
+    }
+
+    #[Route('/new', name: 'product_new', methods: ['GET', 'POST'])]
+    public function new(Request $request): Response
+    {
+        $product = new Product();
+        $form = $this->createForm(ProductType::class, $product);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->entityManager->persist($product);
+            $this->entityManager->flush();
+
+            return $this->redirectToRoute('product_index');
+        }
+
+        return $this->render('product/new.html.twig', [
+            'product' => $product,
+            'form' => $form->createView(),
+        ]);
+    }
+
+    #[Route('/{id}', name: 'product_show', methods: ['GET'])]
+    public function show(int $id): Response
+    {
+        $product = $this->entityManager->getRepository(Product::class)->find($id);
+
+        if (!$product) {
+            throw $this->createNotFoundException('Product not found');
+        }
+
+        return $this->render('product/show.html.twig', [
+            'product' => $product,
+        ]);
+    }
+
+    #[Route('/{id}/edit', name: 'product_edit', methods: ['GET', 'POST'])]
+    public function edit(Request $request, int $id): Response
+    {
+        $product = $this->entityManager->getRepository(Product::class)->find($id);
+
+        if (!$product) {
+            throw $this->createNotFoundException('Product not found');
+        }
+
+        $form = $this->createForm(ProductType::class, $product);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->entityManager->flush();
+
+            return $this->redirectToRoute('product_index');
+        }
+
+        return $this->render('product/edit.html.twig', [
+            'product' => $product,
+            'form' => $form->createView(),
+        ]);
+    }
+
+    #[Route('/{id}', name: 'product_delete', methods: ['POST'])]
+    public function delete(Request $request, int $id): Response
+    {
+        $product = $this->entityManager->getRepository(Product::class)->find($id);
+
+        if (!$product) {
+            throw $this->createNotFoundException('Product not found');
+        }
+
+        $this->entityManager->remove($product);
+        $this->entityManager->flush();
+
+        return $this->redirectToRoute('product_index');
+    }
+
+}
