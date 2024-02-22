@@ -33,9 +33,9 @@ class Product
         return $this->id;
     }
 
-    public function setId(int $Id): static
+    public function setId(int $id): static
     {
-        $this->Id = $Id;
+        $this->id = $id;
 
         return $this;
     }
@@ -84,6 +84,24 @@ class Product
     public function setQuantite(int $quantite): static
     {
         $this->quantite = $quantite;
+
+        return $this;
+    }
+        /**
+     */
+    #[ORM\Column(type:"string", length:255, nullable:true)]
+    private $image;
+
+    // existing getters and setters
+
+    public function getImage(): ?string
+    {
+        return $this->image;
+    }
+
+    public function setImage(?string $image): self
+    {
+        $this->image = $image;
 
         return $this;
     }

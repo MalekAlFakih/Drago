@@ -53,6 +53,7 @@
                 <th>Price</th>
                 <th>Date of Fabrication</th>
                 <th>Quantity</th>
+                <th>Image</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -64,6 +65,10 @@
                     <td>{{ product.dateFabrication|date('Y-m-d') }}</td>
                     <td>{{ product.quantite }}</td>
                     <td>
+                        {% if product.image %}
+                            <img src="{{ product.image }}" alt="{{ product.name }}">
+                        {% endif %}
+                    </td>                    <td>
                         <a href="{{ path('product_show', {'id': product.id}) }}" class="btn btn-primary">Show</a>
                         <a href="{{ path('product_edit', {'id': product.id}) }}" class="btn btn-info">Edit</a>
                         <form action="{{ path('product_delete', {'id': product.id}) }}" method="post" class="delete-form">

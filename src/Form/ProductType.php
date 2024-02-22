@@ -29,6 +29,10 @@ class ProductType extends AbstractType
             ])
             ->add('quantite', IntegerType::class, [
                 'label' => 'quantite'
+            ])
+            ->add('image', TextType::class, [
+                'label' => 'Product Image',
+                'required' => false,
             ]);
     }
 
