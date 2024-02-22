@@ -9,6 +9,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 #[Route('/product')]
 class ProductController extends AbstractController
@@ -21,13 +22,26 @@ class ProductController extends AbstractController
     }
 
     #[Route('/', name: 'product_index', methods: ['GET'])]
-    public function index(): Response
+    public function index(): JsonResponse
     {
         $products = $this->entityManager->getRepository(Product::class)->findAll();
 
-        return $this->render('product/index.html.twig', [
-            'products' => $products,
-        ]);
+        // Serialize products to JSON format
+        $serializedProducts = [];
+        foreach ($products as $product) {
+            $serializedProducts[] = [
+                'id' => $product->getId(),
+                'name' => $product->getName(),
+                'price' => $product->getPrice(),
+                'datefabrication'=> $product->getDatefabrication(),
+                'quantity'=> $product->getQuantite(),
+                'image'=> $product->getImage(),
+                // Add more fields as needed
+            ];
+        }
+
+        // Return JSON response
+        return new JsonResponse($serializedProducts);
     }
 
     #[Route('/new', name: 'product_new', methods: ['GET', 'POST'])]
@@ -101,6 +115,20 @@ class ProductController extends AbstractController
         $this->entityManager->flush();
 
         return $this->redirectToRoute('product_index');
+    }
+    #[Route('/routes', name: 'routes')]
+
+    public function myAction(): Response
+    {
+        $response = new Response();
+        $response->headers->set('Access-Control-Allow-Origin', 'http://127.0.0.1:5500');
+        $response->headers->set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+        $response->headers->set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+        $response->headers->set('Access-Control-Allow-Credentials', 'true');
+
+        // Your controller logic
+
+        return $response;
     }
 
 }
