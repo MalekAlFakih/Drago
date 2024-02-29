@@ -28,6 +28,28 @@ class Product
     #[ORM\Column]
     private ?int $quantite = null;
 
+
+    #[ORM\Column]
+    private ?int $likes= null;
+
+    public function getLikes(): ?int
+    {
+        return $this->likes;
+    }
+
+    public function setLikes(?int $likes): self
+    {
+        $this->likes = $likes;
+        return $this;
+    }
+    public function incrementLikes(): self
+    {
+        $this->likes++;
+
+        return $this;
+    }
+
+
     public function getId(): ?int
     {
         return $this->id;

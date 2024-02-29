@@ -5,3 +5,8 @@ controllers:
 kernel:
     resource: ../src/Kernel.php
     type: annotation
+
+product_sort:
+    path: /products/sort
+    controller: App\Controller\ProductController::sortProducts
+    methods: ['GET']

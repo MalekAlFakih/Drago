@@ -36,6 +36,7 @@ class ProductController extends AbstractController
                 'datefabrication'=> $product->getDatefabrication(),
                 'quantity'=> $product->getQuantite(),
                 'image'=> $product->getImage(),
+                'likes'=>$product->getLikes(),
                 // Add more fields as needed
             ];
         }
@@ -130,5 +131,49 @@ class ProductController extends AbstractController
 
         return $response;
     }
+    #[Route('/{id}/likes', name: 'product_likes', methods: ['POST'])]
+    public function likeProduct(Request $request, $id): JsonResponse
+    {
+        $product = $this->entityManager->getRepository(Product::class)->find($id);
+
+        if (!$product) {
+            throw $this->createNotFoundException('Product not found');
+        }
+
+        // Increment likes
+        $likes = $product->getLikes() + 1;
+        $product->setLikes($likes);
+        
+        // Save changes
+        // Replace this with your preferred method of persisting changes to the database
+        $this->entityManager->persist($product);
+        $this->entityManager->flush();
+
+        return $this->json(['likes' => $likes]);
+    }
+
+    public function sortProducts(Request $request) :JsonResponse
+    {
+        try {
+            $sortBy = $request->query->get('sort', 'likes'); // Default sort by likes
+            $products = $this->entityManager->getRepository(Product::class)->findBy([], [$sortBy => 'DESC']);            $data = [];
+            foreach ($products as $product) {
+                $data[] = [
+                    'id' => $product->getId(),
+                    'name' => $product->getName(),
+                    'price' => $product->getPrice(),
+                    'datefabrication'=> $product->getDatefabrication(),
+                    'quantity'=> $product->getQuantite(),
+                    'image'=> $product->getImage(),
+                    'likes'=>$product->getLikes(),
+                ];
+            }
+    
+            return new JsonResponse($data);
+        } catch (\Exception $e) {
+            return new JsonResponse(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
 
 }
